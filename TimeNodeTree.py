@@ -1,5 +1,5 @@
 bl_info = {'name':"TimeNodeTree", 'author':"ugorek",
-           'version':(1,2,2), 'blender':(4,0,2), #2024.01.19
+           'version':(1,2,3), 'blender':(4,0,2), #2024.01.19
            'description':"Time-Mind-Map using Blender nodes.",
            'location':"NodeTreeEditor",
            'warning':"",
@@ -122,7 +122,6 @@ class TntTnBase(bpy.types.Node, TntTnPads):
         self.DrawPostChain(context, colLy)
         if dict_ndInExecuting[self]!=0:
             dict_ndInExecuting[self] -= 1
-#        colLy.label(text=str(dict_ndInExecuting[self]))
     def GetSksForEvaluate(self): #Pad.
         return (sk for sk in self.inputs)
     def Execute(self):
@@ -352,7 +351,7 @@ def EraDayToYear(eraD): #Float --> Floor.
 def EraDayToDayInYear(eraD): #Float --> Frac.
     def NegMod(a,b):
         return a%(b*((a>0)*2-1))
-    #Победа. Исследование этого было довольно запарным:
+    #Победа. Исследование этого было не таким уж и простым.
     result = NegMod(NegMod((eraD%146097-366),36524),1461)
     result += (result<0)*1461
     return result%365+(result>1459)*365
@@ -767,8 +766,8 @@ class NodeStopwatch(TntTnExecutableOnDraw):
             colLy.alert = False
         colItems = colLy.column(align=True)
         for cyc, li in enumerate(self.captures):
-            rowItem = colItems.row(align=True)
-            rowItem.row().prop(li,'txtCap', text="")
+            rowItem = colItems.row().row(align=True)
+            rowItem.prop(li,'txtCap', text="")
             op = rowItem.operator(NsOp.bl_idname, text="", icon='TRASH')
             op.who = repr(self)+f".captures.remove({cyc})"
             op.opt = 'Exec'
@@ -779,7 +778,7 @@ isDataOnRegisterDoneTgl = True
 @bpy.app.handlers.persistent
 def DataOnRegister(dummy, d):
     if isDataOnRegisterDoneTgl:
-        MnUpdateAllNclassFromTree() #Пока что это наилучший вариант.
+        MnUpdateAllNclassFromTree()
 
 def register():
     bpy.app.handlers.load_post.append(DataOnRegister)
